@@ -1,3 +1,5 @@
-telethon
-Flask
-google-genai
+pyTelegramBotAPI
+aiohttp
+opencv-python-headless
+ddddocr
+numpy
