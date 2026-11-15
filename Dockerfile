@@ -1,6 +1,5 @@
 FROM python:3.10-slim
 
-# OpenCV နဲ့ ddddocr အတွက် လိုအပ်တဲ့ System Libraries တွေ သွင်းခြင်း
 RUN apt-get update && apt-get install -y \
     libgl1 \
     libglib2.0-0 \
