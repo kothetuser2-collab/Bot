@@ -1,9 +1,12 @@
 FROM python:3.10-slim
 
-# Install system dependencies required for opencv and ddddocr
+# OpenCV နဲ့ ddddocr အတွက် လိုအပ်တဲ့ System Libraries တွေ သွင်းခြင်း
 RUN apt-get update && apt-get install -y \
     libgl1 \
     libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
