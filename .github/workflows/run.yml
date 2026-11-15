@@ -1,0 +1,19 @@
+name: Run Bot
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y libgl1 libglib2.0-0
+          pip install telebot aiohttp opencv-python-headless ddddocr numpy
+      - run: python me.py
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
