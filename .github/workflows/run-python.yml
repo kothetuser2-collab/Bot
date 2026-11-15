@@ -1,0 +1,25 @@
+name: Run Python Script
+
+on:
+  workflow_dispatch:  # ဤနေရာတွင် Manual trigger button ကို ဖွင့်ပေးသည်
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11' # သင့် script လိုအပ်သော version သို့ ပြောင်းလဲပါ
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # သင့်တွင် requirements.txt ရှိပါက အောက်ပါလိုင်းကို ဖွင့်ပါ
+          # pip install -r requirements.txt
+
+      - name: Run Python script
+        run: python your_script.py  # သင့် .py ဖိုင်၏ အမည်အမှန်ကို ဖြည့်ပါ
